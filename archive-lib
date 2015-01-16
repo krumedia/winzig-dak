@@ -228,7 +228,7 @@ changes_canonic ()
     suite=`echo "$archive" | fetch_field "Distribution"`
     arches=`echo "$archive" | fetch_field "Architecture"`
 
-    for arch in $(filter_real_arches $arches); do
+    for arch in $(filter_real_arches $arches) all; do
       printf "%s %s %s %s %s\n" $package $suite $arch $version $f_changes
     done
   done

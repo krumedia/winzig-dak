@@ -73,14 +73,14 @@ done
 
 cd - >/dev/null
 
-if [ "$INSTALLED" = "yes" ]; then
-  ./archive-lists
+if [ "$INSTALLED" = "yesnodebug" ]; then
+#  ./archive-lists
   ./archive-changes-lists
-  ./archive-obsolete
-  ./archive-mirror-arch-all
+#  ./archive-obsolete
+#  ./archive-mirror-arch-all
   ./archive-reindex-files
   ./archive-reindex-meta
-  ./archive-mirror-push
+#  ./archive-mirror-push
   ./archive-quinn
   ./archive-stats
 fi
