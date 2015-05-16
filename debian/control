@@ -10,7 +10,7 @@ Package: winzig-dak
 Architecture: all
 Depends: apt-utils, procmail, incron, gnupg
 Recommends: ssh, ftp-server, httpd
-Description: Partial and lightweight reimplementation of dak
+Description: Partial and leightweight reimplementation of dak
  This is winzig-dak a fork of mini-dak.
  .
  Both a partial and lightweight reimplementation of dak (Debian Archive Kit)

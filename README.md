@@ -5,7 +5,7 @@ Introduction
 
 This is winzig-dak a fork of mini-dak.
 
-Both are partial and lightweight reimplementation of dak
+Both are partial and leightweight reimplementation of dak
 (Debian Archive Kit) in shell script and with no database
 dependencies, "designed" to host small Debian repositories.
 
