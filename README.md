@@ -57,6 +57,8 @@ TODO
 * give ability to delete a package with a specific version
 * is it necessary to deploy the *.changes (they are not doing that in the
   official repositories)
+* generate human readable information about available packages
+  (one XML file for every package, so we can use xslt (?))
 
 BUGS
 ----
