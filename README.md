@@ -5,7 +5,7 @@ Introduction
 
 This is winzig-dak a fork of mini-dak.
 
-Both a partial and lightweight reimplementation of dak
+Both are partial and lightweight reimplementation of dak
 (Debian Archive Kit) in shell script and with no database
 dependencies, "designed" to host small Debian repositories.
 
@@ -30,14 +30,14 @@ Download the sources, and put them for example in '/srv/ftp.foo.org/bin',
 create a user for it (optional), edit archive.conf and run archive-setup.
 Depending on the configured functionality or what parts of mini-dak are
 used, you will need some additional software, listed by: «grep Requires: *».
-Install the cronjob. Enjoy.
+Enjoy.
 
 
 TODO
 ----
 
-* delete stuff used to download/mirror upstream archives
 * delete hacks for unreleased
 * create a dokumentation
 * debianize / make debian-package
-* much more …
+* give ability to delete a package with a specific version
+
