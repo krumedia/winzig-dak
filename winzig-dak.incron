@@ -1,0 +1,2 @@
+/var/dak/ftp/incoming IN_CREATE,IN_MOVED_TO /var/lib/winzig-dak/archive-trigger $#
+
