@@ -105,7 +105,6 @@ create_repo ()
   mkdir -p $queue_dir
   mkdir -p $unchecked_dir
   mkdir -p $accepted_dir
-  mkdir -p $rejected_dir
   mkdir -p $byhand_dir
 
   mkdir -p $quinn_dir

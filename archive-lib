@@ -33,8 +33,6 @@ unset LC_ALL
 # Canonicalize directories
 
 accepted_dir=$queue_dir/accepted
-rejected_dir=$queue_dir/rejected
-rejected_daily_dir=$rejected_dir/`date -I`
 unchecked_dir=$queue_dir/unchecked
 byhand_dir=$queue_dir/byhand
 

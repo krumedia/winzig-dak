@@ -183,21 +183,19 @@ queue_rejected ()
   local signer=$4
   local files=
 
-  mkdir -p $rejected_daily_dir
-
   if [ "$signer" ]; then
     files="`fetch_secure_files < $archive_file` $changes_file $archive_file"
   else
     files=$changes_file
   fi
 
-  if mv $files $rejected_daily_dir; then
-    log queue "mv_rejected_success ${archive_file##*/}"
+  if rm $files; then
+    log queue "rm_rejected_success ${archive_file##*/}"
     notice_rejected $changes_file "$outcome" "$signer"
     return 0
   else
     script_error "queue_rejected" "$?"
-    log queue "mv_rejected_failed ${archive_file##*/}"
+    log queue "rm_rejected_failed ${archive_file##*/}"
     return 1
   fi
 }
