@@ -1,0 +1,6 @@
+* configure winzig-dak user
+* make links to /usr/bin
+* logrotate
+* add winzig-dak to /etc/incron.allow
+* configure apache
+* run archive-setup

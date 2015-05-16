@@ -1,0 +1,11 @@
+usr/lib/winzig-dak
+etc/winzig-dak
+var/dak/cache
+var/dak/queue
+var/dak/ftp/incoming
+var/dak/ftp/debian/indices
+var/dak/ftp/debian/pool
+var/dak/ftp/debian/dists
+var/dak/ftp/debian/obsolete
+var/dak/.gnupg
+
