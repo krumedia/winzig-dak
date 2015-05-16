@@ -51,8 +51,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 TODO
 ----
 
-* delete hacks for unreleased
+* try to understand and then delete hacks for unreleased/experimental
 * create a dokumentation
 * debianize / make debian-package
 * give ability to delete a package with a specific version
+* is it necessary to deploy the *.changes (they are not doing that in the
+  official repositories)
+
+BUGS
+----
+
+* packages for the architecture "all" needs to run archive-reindex-* twice
+  before they occure in the Release-Files of the other architectures
 
