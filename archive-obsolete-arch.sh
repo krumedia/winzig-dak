@@ -19,7 +19,7 @@
 
 # Import library
 
-. archive-lib
+. archive-lib.sh
 
 target_arch=$1
 

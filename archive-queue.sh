@@ -20,7 +20,7 @@
 
 # Import library
 
-. archive-lib
+. archive-lib.sh
 
 ######
 # data validation functions

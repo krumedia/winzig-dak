@@ -23,7 +23,7 @@
 
 # Import library
 
-. archive-lib
+. archive-lib.sh
 
 # file output
 
@@ -74,10 +74,10 @@ done
 cd - >/dev/null
 
 if [ "$INSTALLED" = "yes" ]; then
-  ./archive-changes-lists
-#  ./archive-obsolete
-  ./archive-reindex-files
-  ./archive-reindex-meta
-#  ./archive-mirror-push
-  ./archive-stats
+  ./archive-changes-lists.sh
+#  ./archive-obsolete.sh
+  ./archive-reindex-files.sh
+  ./archive-reindex-meta.sh
+#  ./archive-mirror-push.sh
+  ./archive-stats.sh
 fi

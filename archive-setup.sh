@@ -19,7 +19,7 @@
 
 # Import library
 
-. archive-lib
+. archive-lib.sh
 
 create_apt_config ()
 {
