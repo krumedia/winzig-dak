@@ -27,7 +27,7 @@
 
 verify_symlink_attack ()
 {
-  changes_file=$1
+  local changes_file=$1
 
   if [ -L $changes_file ]; then
     return 1
