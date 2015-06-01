@@ -42,13 +42,23 @@ for arch in $(get_archive_arches); do
   done
 done
 
+echo_time '-> Merging mirrored files into suite file lists ...'
+for listname in ${cache_dir}/mirror*.list; do
+  suite=$(basename ${listname} .list | cut -d'_' -f 2)
+  arch=$(basename ${listname} .list | cut -d'_' -f 3)
+  grep '\.deb$' $listname \
+    >> $cache_dir/files_${suite}_${arch}.list.new
+  grep '\.udeb$' $listname \
+    >> $cache_dir/files_${suite}_${arch}.di.list.new
+done
+
 echo_time '-> Merging arch:all files into suite file lists ...'
 # FIXME: Hardcoded suite
 for suite in $suite_list; do
   for arch in $(filter_real_arches $(get_suite_arches $suite)); do
-    grep '_all\.deb$' $cache_dir/files_${suite}_all.list \
+    grep '\.deb$' $cache_dir/files_${suite}_all.list.new \
       >> $cache_dir/files_${suite}_$arch.list.new
-    grep '_all\.udeb$' $cache_dir/files_${suite}_all.list \
+    grep '\.udeb$' $cache_dir/files_${suite}_all.list.new \
       >> $cache_dir/files_${suite}_$arch.di.list.new
   done
 done

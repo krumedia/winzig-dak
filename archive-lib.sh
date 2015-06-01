@@ -188,30 +188,41 @@ poolize_hash_name()
   echo $1 | sed -e 's/^\(\(lib\)\?.\).*$/\1/'
 }
 
-poolize_package_name()
+poolize_package_name_relative()
 {
   local name=$1
   local package=`echo $name | cut -d_ -f1`
   local section=main
   local hash_dir=`poolize_hash_name $package`
-  local dest_dir=$pool_dir/$section/$hash_dir/$package/
-
+  local dest_dir=$section/$hash_dir/$package/
+  
   echo $dest_dir
 }
 
-poolize_arch_name()
+poolize_package_name()
+{
+  echo $pool_dir/$(poolize_package_name_relative $1)
+}
+
+poolize_arch_name_relative()
 {
   local package=$1
   local arch=$2
   local section=main
   local hash_dir=`poolize_hash_name $package`
 
-  if [ "$multipool" = "yes" ]; then
-    local dest_dir=$pool_dir-$arch/$section/$hash_dir/$package/
-  else
-    local dest_dir=$pool_dir/$section/$hash_dir/$package/
-  fi
+  echo $section/$hash_dir/$package/
+}
 
+poolize_arch_name()
+{
+  local dest_dir_relative=$(poolize_arch_name_relative $1 $2)
+  if [ "$multipool" = "yes" ]; then
+    local dest_dir=$pool_dir-$arch/$dest_dir_relative
+  else
+    local dest_dir=$pool_dir/$dest_dir_relative
+  fi
+  
   echo $dest_dir
 }
 
