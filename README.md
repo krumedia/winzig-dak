@@ -50,7 +50,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 TODO
 ----
-
+* Allow upload to others sections than main
+  (archive-lib.sh#195,#211)
 * try to understand and then delete hacks for unreleased/experimental
 * create a dokumentation
 * debianize / make debian-package
@@ -59,10 +60,10 @@ TODO
   official repositories)
 * generate human readable information about available packages
   (one XML file for every package, so we can use xslt (?))
+* generate symlinks for dist-aliases
 
 BUGS
 ----
 
-* packages for the architecture "all" needs to run archive-reindex-* twice
-  before they occure in the Release-Files of the other architectures
-
+* Packages with a suite-alias are accepted and copied to the pool, but they
+  don’t appear in dists/…/Contents
