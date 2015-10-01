@@ -192,9 +192,8 @@ poolize_package_name_relative()
 {
   local name=$1
   local package=`echo $name | cut -d_ -f1`
-  local section=main
   local hash_dir=`poolize_hash_name $package`
-  local dest_dir=$section/$hash_dir/$package/
+  local dest_dir=$hash_dir/$package/
   
   echo $dest_dir
 }
@@ -208,10 +207,9 @@ poolize_arch_name_relative()
 {
   local package=$1
   local arch=$2
-  local section=main
   local hash_dir=`poolize_hash_name $package`
 
-  echo $section/$hash_dir/$package/
+  echo $hash_dir/$package/
 }
 
 poolize_arch_name()
@@ -230,6 +228,7 @@ poolize_arch_name()
 
 changes_canonic ()
 {
+  section=$1
   while read f_changes; do
     archive=`changes_strip < $f_changes`
     package=`echo "$archive" | fetch_source_name`
@@ -238,7 +237,7 @@ changes_canonic ()
     arches=`echo "$archive" | fetch_field "Architecture"`
 
     for arch in $(filter_real_arches $arches) all; do
-      printf "%s %s %s %s %s\n" $package $suite $arch $version $f_changes
+      printf "%s %s %s %s %s %s\n" $package $suite $section $arch $version $f_changes
     done
   done
 }
@@ -289,11 +288,9 @@ archive_move ()
     shift
   fi
   local archive_file=$1
-  local changes_file=`basename $archive_file archive`changes
+  local section=$(basename $(dirname $archive_file))
   local dest_dir=$2
   local files=`$fetch_files < $archive_file`
-
-  mv -f $changes_file "$dest_dir" 2>/dev/null
 
   if mv $files "$dest_dir"; then
     return 0

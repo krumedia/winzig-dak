@@ -28,8 +28,12 @@
 echo_time "-> Collecting .changes files lists..."
 for arch in $(get_archive_arches); do
   echo_time " -> Collecting .changes files list... [$arch]"
-  find $(get_pool_dir_arch $arch) -name '*.changes' | changes_canonic | \
-    sort > $cache_dir/changes_$arch.list
+  truncate -s0 $cache_dir/changes_$arch.list
+  for file in $(find ${cache_dir}/changes -name '*.changes'); do
+    section=$(basename $(dirname ${file}))
+    echo ${file} | changes_canonic ${section} >> $cache_dir/changes_$arch.list
+  done
+  sort $cache_dir/changes_$arch.list -o $cache_dir/changes_$arch.list
 done
 
 echo_time "-> Done."

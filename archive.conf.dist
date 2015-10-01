@@ -18,7 +18,7 @@ export GNUPGHOME=/var/dak/.gnupg
 # use this to verify the dpkg-sig of the builder role
 # use_dpkg_sig=yes
 
-# The push mirrors. executes `ssh push@mirror-1.example.com &`
+# The push mirrors. used as ssh rsync-destinations
 # archive_push_mirrors="push@mirror-1.example.com push@mirror-2.example.com"
 
 # This must be an absolute path.

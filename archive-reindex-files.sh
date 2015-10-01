@@ -28,50 +28,54 @@
 echo_time "-> Regenerating file lists..."
 for arch in $(get_archive_arches); do
   echo_time " -> Regenerating file list.. [$arch]"
-  cat $cache_dir/changes_$arch.list | while read package suite arch version path; do
+  cat $cache_dir/changes_$arch.list | while read package suite section arch version path; do
     archive_file=`changes_strip < $path`
-    basepath=`dirname $path`
-    basedir=${basepath#$archive_dir/}
+    basedir=$(poolize_package_name ${package})
     files=`echo "$archive_file" | fetch_files`
     filepaths=`echo "$files" | sed -e "s:^ *:$basedir/:"`
 
     echo "$filepaths" | grep "_\($arch\|all\)\.deb" \
-      >> $cache_dir/files_${suite}_$arch.list.new
+      >> $cache_dir/dists/${suite}_${section}_$arch.list.new
     echo "$filepaths" | grep "_\($arch\|all\)\.udeb" \
-      >> $cache_dir/files_${suite}_$arch.di.list.new
+      >> $cache_dir/dists/${suite}_${section}_$arch.di.list.new
   done
 done
 
 echo_time '-> Merging mirrored files into suite file lists ...'
 for listname in ${cache_dir}/mirror*.list; do
   suite=$(basename ${listname} .list | cut -d'_' -f 2)
-  arch=$(basename ${listname} .list | cut -d'_' -f 3)
+  section=$(basename ${listname} .list | cut -d'_' -f 3)
+  arch=$(basename ${listname} .list | cut -d'_' -f 4)
   grep '\.deb$' $listname \
-    >> $cache_dir/files_${suite}_${arch}.list.new
+    >> $cache_dir/dists/${suite}_${section}_${arch}.list.new
   grep '\.udeb$' $listname \
-    >> $cache_dir/files_${suite}_${arch}.di.list.new
+    >> $cache_dir/dists/${suite}_${section}_${arch}.di.list.new
 done
 
 echo_time '-> Merging arch:all files into suite file lists ...'
 # FIXME: Hardcoded suite
 for suite in $suite_list; do
   for arch in $(filter_real_arches $(get_suite_arches $suite)); do
-    grep '\.deb$' $cache_dir/files_${suite}_all.list.new \
-      >> $cache_dir/files_${suite}_$arch.list.new
-    grep '\.udeb$' $cache_dir/files_${suite}_all.list.new \
-      >> $cache_dir/files_${suite}_$arch.di.list.new
+    for section in ${section_list}; do
+      grep '\.deb$' $cache_dir/dists/${suite}_${section}_all.list.new \
+        >> $cache_dir/dists/${suite}_${section}_$arch.list.new
+      grep '\.udeb$' $cache_dir/dists/${suite}_${section}_all.list.new \
+        >> $cache_dir/dists/${suite}_${section}_$arch.di.list.new
+    done
   done
 done
 
 echo_time "-> Moving new file lists into place..."
 for suite in $suite_list; do
   for arch in $(get_suite_arches $suite); do
-    touch $cache_dir/files_${suite}_$arch.list.new
-    mv -f $cache_dir/files_${suite}_$arch.list.new \
-          $cache_dir/files_${suite}_$arch.list
-    touch $cache_dir/files_${suite}_$arch.di.list.new
-    mv -f $cache_dir/files_${suite}_$arch.di.list.new \
-          $cache_dir/files_${suite}_$arch.di.list
+    for section in ${section_list}; do
+      touch $cache_dir/dists/${suite}_${section}_$arch.list.new
+      mv -f $cache_dir/dists/${suite}_${section}_$arch.list.new \
+            $cache_dir/dists/${suite}_${section}_$arch.list
+      touch $cache_dir/dists/${suite}_${section}_$arch.di.list.new
+      mv -f $cache_dir/dists/${suite}_${section}_$arch.di.list.new \
+            $cache_dir/dists/${suite}_${section}_$arch.di.list
+    done
   done
 done
 

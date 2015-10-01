@@ -40,7 +40,7 @@ cat clone.list | while read suite arch package; do
 	fi
 	
 	source_dir=${debian_archive}pool/$(poolize_arch_name_relative $package $arch)
-	wget -c ${source_dir}* -P $dest_dir
+	wget -e robots=off -nH --cut-dirs=5 -c -r --no-parent ${source_dir} -P $dest_dir -R "index.html*"
 	
 	find $dest_dir -type f | sort >> $cache_dir/mirror_${suite}_${arch}.list
 	

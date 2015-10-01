@@ -29,21 +29,31 @@
 
 pool_install ()
 {
-  local archive_file=$1
+  local archive_file=$(realpath $1)
+  local changes_file=$(dirname $archive_file)/$(basename $archive_file archive)changes
+  local section=$(basename $(dirname $archive_file))
   local package=`fetch_source_name < $archive_file`
   local arch=`fetch_single_arch < $archive_file`
-  local dest_dir=`poolize_arch_name $package $arch`
+  local dest_dir=`poolize_arch_name $package $arch $section`
+  
+  cd $(dirname $archive_file)
 
   if [ ! -d "$dest_dir" ]; then
     mkdir -p $dest_dir
   fi
 
   if archive_move $archive_file $dest_dir; then
+
+    mkdir -p ${cache_dir}/changes/${section}
+    mv -f $changes_file ${cache_dir}/changes/${section}
+
     log install "install_success ${archive_file##*/}"
+    cd $OLDPWD
     return 0
   else
     script_error "$?"
     log install "install_failed ${archive_file##*/}"
+    cd $OLDPWD
     return 1
   fi
 }
@@ -60,24 +70,22 @@ script_error ()
 # Main
 #
 
+main_pwd=$(pwd)
 cd $accepted_dir
 
 shopt -s nullglob
 
-for archive_file in *.archive; do
+for archive_file in */*.archive; do
     pool_install "$archive_file"
     rm $archive_file
 
     INSTALLED=yes
 done
 
-cd - >/dev/null
+cd $main_pwd
 
 if [ "$INSTALLED" = "yes" ]; then
   ./archive-changes-lists.sh
-#  ./archive-obsolete.sh
   ./archive-reindex-files.sh
   ./archive-reindex-meta.sh
-#  ./archive-mirror-push.sh
-  ./archive-stats.sh
 fi

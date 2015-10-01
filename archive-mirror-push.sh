@@ -31,7 +31,7 @@
 
 echo_time "-> Starting mirrors push..."
 for mirror in $archive_push_mirrors; do
-  echo_time " -> Backgrounding mirror push... [$mirror]"
-  ssh $mirror &
+  echo_time " -> Mirror push... [$mirror]"
+  rsync -avz -e ssh $archive_dir/* $mirror --exclude=obsolete/*
 done
 echo_time "-> Done."

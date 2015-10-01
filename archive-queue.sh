@@ -20,6 +20,8 @@
 
 # Import library
 
+set -e
+
 . archive-lib.sh
 
 ######
@@ -69,7 +71,8 @@ verify_gpg_signature ()
 verify_dpkg_signature ()
 {
   local archive_file=$1
-  local files=`fetch_secure_files < $archive_file | grep '\.u\?deb$'`
+  local section=$(basename $(dirname $archive_file))
+  local files=`fetch_secure_files $section < $archive_file $section | grep '\.u\?deb$'`
 
   if [ "$use_dpkg_sig" != yes ]; then
     return 0
@@ -91,13 +94,14 @@ verify_dpkg_signature ()
 verify_md5sums ()
 {
   local archive_file=$1
+  local section=$(basename $(dirname $archive_file))
   local md5sum=md5sum.textutils
 
   if ! which $md5sum >/dev/null; then
     md5sum=md5sum
   fi
 
-  if fetch_md5sums < $archive_file | $md5sum -c >& /dev/null; then
+  if fetch_md5sums $section < $archive_file | $md5sum -c >& /dev/null; then
     return 0
   else
     return 1
@@ -134,6 +138,20 @@ verify_arch ()
   return 0
 }
 
+verify_section ()
+{
+  local archive_file=$1
+  local target_section=$(basename $(dirname $archive_file))
+
+  for section in $section_list; do
+    if [ "$section" = "$target_section" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 verify_multiarch_changes ()
 {
   local archive_file=$1
@@ -159,14 +177,16 @@ queue_accepted ()
   local changes_file=$1
   local archive_file=$2
   local signer=$3
+  local section=$(basename $(dirname $archive_file))
   local files=`fetch_secure_files < $archive_file`
   local files_install="$files $changes_file $archive_file"
 
   files_owner_perms $files_install
 
-  if mv $files_install $accepted_dir; then
+  mkdir -p $accepted_dir/$section
+  if mv $files_install $accepted_dir/$section; then
     log queue "mv_accepted_success ${archive_file##*/}"
-    notice_accepted $changes_file "$files" "$signer"
+    notice_accepted $changes_file "$section" "$files" "$signer"
     return 0
   else
     script_error "queue_accepted" "$?"
@@ -179,8 +199,9 @@ queue_rejected ()
 {
   local outcome=$1
   local changes_file=$2
-  local archive_file=$3
-  local signer=$4
+  local section=$3
+  local archive_file=$4
+  local signer=$5
   local files=
 
   if [ "$signer" ]; then
@@ -191,7 +212,7 @@ queue_rejected ()
 
   if rm $files; then
     log queue "rm_rejected_success ${archive_file##*/}"
-    notice_rejected $changes_file "$outcome" "$signer"
+    notice_rejected $changes_file $section "$outcome" "$signer"
     return 0
   else
     script_error "queue_rejected" "$?"
@@ -205,13 +226,15 @@ queue_rejected ()
 notice_rejected ()
 {
   local changes_file=${1##*/}
-  local outcome=$2
-  local signer=$3
+  local section=$2
+  local outcome=$3
+  local signer=$4
 
   ( cat <<-HERE
 Uploader: $signer
 Host: `hostname -f`
 Rejected: $changes_file
+Section: $section
 Reason: $outcome
 HERE
   ) | msg_queue "$changes_file REJECTED" "$signer"
@@ -221,13 +244,15 @@ HERE
 notice_accepted ()
 {
   local changes_file=${1##*/}
-  local files=$2
-  local signer=$3
+  local section=$2
+  local files=$3
+  local signer=$4
 
   ( cat <<-HERE
 Uploader: $signer
 Host: `hostname -f`
 Accepted: $changes_file
+Section: $section
 Files:
 $files
 HERE
@@ -248,66 +273,82 @@ cd $incoming_dir
 
 shopt -s nullglob
 
-for changes_file in *.changes; do
+for full_changes_file in {,*/}*.changes; do
 
-  cd $incoming_dir
+  changes_file=$(basename $full_changes_file)
+  subdir=$(dirname $full_changes_file)
+  section=$subdir
+  
+  # fallback
+  if [ "$section" = "." ]; then
+    section="main"
+  fi
+
+  cd $incoming_dir/$subdir
 
   if ! fuser $changes_file; then
-    mv -f $changes_file $unchecked_dir/$changes_file
+    mkdir -p $unchecked_dir/$section
+    mv -f $changes_file $unchecked_dir/$section/$changes_file
 
-    changes_file=$unchecked_dir/$changes_file
-    archive_file=$unchecked_dir/$(basename $changes_file changes)archive
+    changes_file=$unchecked_dir/$section/$changes_file
+    archive_file=$unchecked_dir/$section/$(basename $changes_file changes)archive
 
     if ! verify_symlink_attack $changes_file; then
-      queue_rejected "error-symlink-attack" $changes_file
+      queue_rejected "error-symlink-attack" $changes_file $section
       continue
     fi
 
     if ! verify_size $changes_file; then
-      queue_rejected "toobig-changes-file" $changes_file
+      queue_rejected "toobig-changes-file" $changes_file $section
       continue
     fi
 
     if ! verify_gpg_signature $changes_file $archive_file; then
-      queue_rejected "wrong-signature" $changes_file
+      queue_rejected "wrong-signature" $changes_file $section
       continue
     fi
 
     signer=`fetch_field "Signed-By" < $archive_file`
 
     if ! verify_dpkg_signature $archive_file; then
-      queue_rejected "wrong-dpkg-signature" $changes_file $archive_file "$signer"
+      queue_rejected "wrong-dpkg-signature" $changes_file $section $archive_file "$signer"
       continue
     fi
 
     # Move the .archive contents to unchecked
 
-    if archive_move secure "$archive_file" "$unchecked_dir"; then
+    mkdir -p $unchecked_dir/$section
+    if archive_move secure "$archive_file" "$unchecked_dir/$section"; then
       log queue "mv_unchecked_success ${archive_file##*/}"
     else
       log queue "mv_unchecked_failed ${archive_file##*/}"
       continue
     fi
 
-    cd $unchecked_dir
+    cd $unchecked_dir/$section
 
     if ! verify_md5sums $archive_file; then
-      queue_rejected "wrong-md5sums" $changes_file $archive_file "$signer"
+      queue_rejected "wrong-md5sums" $changes_file $section $archive_file "$signer"
       continue
     fi
 
     if ! verify_suite $archive_file; then
-      queue_rejected "wrong-suite" $changes_file $archive_file "$signer"
+      queue_rejected "wrong-suite" $changes_file $section $archive_file "$signer"
       continue
     fi
 
     if ! verify_arch $archive_file; then
-      queue_rejected "wrong-arch" $changes_file $archive_file "$signer"
+      queue_rejected "wrong-arch" $changes_file $section $archive_file "$signer"
+      continue
+    fi
+
+    if ! verify_section $archive_file; then
+      queue_rejected "wrong-section" $changes_file $section $archive_file "$signer"
       continue
     fi
 
     if ! verify_multiarch_changes $archive_file; then
-      queue_rejected "wrong-multiarch-changes" $changes_file $archive_file "$signer"
+      queue_rejected "wrong-multiarch-changes" $changes_file $section $archive_file "$signer"
       continue
     fi
 

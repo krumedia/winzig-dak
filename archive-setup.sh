@@ -47,6 +47,7 @@ create_apt_config ()
 	TreeDefault {
 	  Directory		"pool-\$(ARCH)/";
 	  SrcDirectory		"pool/";
+	  FileList		"\$(DIST)_\$(SECTION)_\$(ARCH).list";
 	};
 	
 HERE
@@ -54,7 +55,6 @@ HERE
   for suite in $suite_list; do
     cat >> $apt_config <<-HERE
 	Tree "dists/$suite" {
-	  FileList		"files_${suite}_\$(ARCH).list";
 	  Sections		"$(get_suite_sections $suite)";
 	  Architectures		"$(get_suite_arches $suite)";
 	};
@@ -69,7 +69,9 @@ HERE
 create_repo ()
 {
   if [ ! -d $incoming_dir ]; then
-    mkdir -p $incoming_dir
+    for section in $section_list; do
+      mkdir -p $incoming_dir/${section}
+    done
   fi
 
   for suite in $suite_list; do
@@ -99,7 +101,8 @@ create_repo ()
     done
   done
 
-  mkdir -p $cache_dir
+  mkdir -p $cache_dir/dists
+  mkdir -p $cache_dir/changes
   mkdir -p $indices_dir
 
   mkdir -p $queue_dir
@@ -107,7 +110,6 @@ create_repo ()
   mkdir -p $accepted_dir
   mkdir -p $byhand_dir
 
-  mkdir -p $quinn_dir
   mkdir -p $log_dir
 
   for d in $(get_pool_dirs); do

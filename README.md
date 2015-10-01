@@ -3,7 +3,7 @@ winzig-dak - Partial and lightweight reimplementation of dak forked from mini-da
 Introduction
 ------------
 
-This is winzig-dak a fork of mini-dak.
+This is winzig-dak, a fork of mini-dak.
 
 Both are partial and leightweight reimplementation of dak
 (Debian Archive Kit) in shell script and with no database
@@ -18,7 +18,7 @@ winzig-dak uses this leightweight implementation, but can be used to share
 packages in addition to the official repositories.
 
 mini-dak source repository
------------------
+--------------------------
 
   <http://git.hadrons.org/?p=debian/mini-dak.git>
   <git://git.hadrons.org/git/debian/mini-dak.git>
@@ -33,7 +33,7 @@ used, you will need some additional software, listed by: «grep Requires: *».
 Enjoy.
 
 License
-------
+-------
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ TODO
 * Allow upload to others sections than main
   (archive-lib.sh#195,#211)
 * try to understand and then delete hacks for unreleased/experimental
-* create a dokumentation
 * debianize / make debian-package
 * give ability to delete a package with a specific version
 * is it necessary to deploy the *.changes (they are not doing that in the
@@ -61,9 +60,10 @@ TODO
 * generate human readable information about available packages
   (one XML file for every package, so we can use xslt (?))
 * generate symlinks for dist-aliases
+* clone only specific versions
 
-BUGS
-----
+KNOWN BUGS
+----------
 
 * Packages with a suite-alias are accepted and copied to the pool, but they
   don’t appear in dists/…/Contents
