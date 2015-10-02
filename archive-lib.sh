@@ -191,30 +191,32 @@ poolize_hash_name()
 poolize_package_name_relative()
 {
   local name=$1
+  local section=$2
   local package=`echo $name | cut -d_ -f1`
   local hash_dir=`poolize_hash_name $package`
-  local dest_dir=$hash_dir/$package/
+  local dest_dir=$section/$hash_dir/$package/
   
   echo $dest_dir
 }
 
 poolize_package_name()
 {
-  echo $pool_dir/$(poolize_package_name_relative $1)
+  echo $pool_dir/$(poolize_package_name_relative $1 $2)
 }
 
 poolize_arch_name_relative()
 {
   local package=$1
-  local arch=$2
+  local section=$2
+  local arch=$3
   local hash_dir=`poolize_hash_name $package`
 
-  echo $hash_dir/$package/
+  echo $section/$hash_dir/$package/
 }
 
 poolize_arch_name()
 {
-  local dest_dir_relative=$(poolize_arch_name_relative $1 $2)
+  local dest_dir_relative=$(poolize_arch_name_relative $1 $2 $3)
   if [ "$multipool" = "yes" ]; then
     local dest_dir=$pool_dir-$arch/$dest_dir_relative
   else

@@ -30,7 +30,7 @@ for arch in $(get_archive_arches); do
   echo_time " -> Regenerating file list.. [$arch]"
   cat $cache_dir/changes_$arch.list | while read package suite section arch version path; do
     archive_file=`changes_strip < $path`
-    basedir=$(poolize_package_name ${package})
+    basedir=$(poolize_package_name ${package} ${section})
     files=`echo "$archive_file" | fetch_files`
     filepaths=`echo "$files" | sed -e "s:^ *:$basedir/:"`
 
@@ -42,14 +42,14 @@ for arch in $(get_archive_arches); do
 done
 
 echo_time '-> Merging mirrored files into suite file lists ...'
-for listname in ${cache_dir}/mirror*.list; do
-  suite=$(basename ${listname} .list | cut -d'_' -f 2)
-  section=$(basename ${listname} .list | cut -d'_' -f 3)
-  arch=$(basename ${listname} .list | cut -d'_' -f 4)
+for listname in ${cache_dir}/dists/*-mirror*.list; do
+  suite=$(basename ${listname} .list | cut -d'_' -f 1)
+  section=$(basename ${listname} .list | cut -d'_' -f 2)
+  arch=$(basename ${listname} .list | cut -d'_' -f 3)
   grep '\.deb$' $listname \
-    >> $cache_dir/dists/${suite}_${section}_${arch}.list.new
+    >> $cache_dir/dists/${suite%-mirror}_${section}_${arch}.list.new
   grep '\.udeb$' $listname \
-    >> $cache_dir/dists/${suite}_${section}_${arch}.di.list.new
+    >> $cache_dir/dists/${suite%-mirror}_${section}_${arch}.di.list.new
 done
 
 echo_time '-> Merging arch:all files into suite file lists ...'

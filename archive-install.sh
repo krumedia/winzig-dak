@@ -34,7 +34,7 @@ pool_install ()
   local section=$(basename $(dirname $archive_file))
   local package=`fetch_source_name < $archive_file`
   local arch=`fetch_single_arch < $archive_file`
-  local dest_dir=`poolize_arch_name $package $arch $section`
+  local dest_dir=`poolize_arch_name $package $section $arch`
   
   cd $(dirname $archive_file)
 

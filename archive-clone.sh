@@ -31,18 +31,18 @@ if [ ! -e clone.list ]; then
 	exit 0
 fi
 
-rm $cache_dir/mirror_*.list
+rm -f $cache_dir/mirror_*.list
 
-cat clone.list | while read suite arch package; do
-	dest_dir=$(poolize_arch_name $package $arch)
+cat clone.list | while read suite source_section target_section arch package; do
+	dest_dir=$(poolize_arch_name $package $target_section $arch)
 	if [ ! -d "$dest_dir" ]; then 
 		mkdir -p $dest_dir
 	fi
 	
-	source_dir=${debian_archive}pool/$(poolize_arch_name_relative $package $arch)
-	wget -e robots=off -nH --cut-dirs=5 -c -r --no-parent ${source_dir} -P $dest_dir -R "index.html*"
+	source_dir=${debian_archive}pool/$(poolize_arch_name_relative $package $source_section $arch)
+	wget -e robots=off -nH --cut-dirs=5 -c -r --no-parent ${source_dir} -P $dest_dir -R "index.html*" --no-passive-ftp
 	
-	find $dest_dir -type f | sort >> $cache_dir/mirror_${suite}_${arch}.list
+	find $dest_dir -type f | sort >> $cache_dir/dists/${suite}-mirror_${target_section}_${arch}.list
 	
 done
 

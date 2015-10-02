@@ -50,13 +50,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 TODO
 ----
-* Allow upload to others sections than main
-  (archive-lib.sh#195,#211)
 * try to understand and then delete hacks for unreleased/experimental
 * debianize / make debian-package
 * give ability to delete a package with a specific version
-* is it necessary to deploy the *.changes (they are not doing that in the
-  official repositories)
 * generate human readable information about available packages
   (one XML file for every package, so we can use xslt (?))
 * generate symlinks for dist-aliases
