@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2015 Matthias Blümel <blaimi@blaimi.de>
+# Copyright ï¿½ 2015 Matthias Blï¿½mel <blaimi@blaimi.de>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ deploy_archive()
   local files=`fetch_files < $archive_file`
 
   for deployment in $deployments; do
-    dest=$deployment_dir/$deployment/$section/$package
+    dest=$deployment_dir/$(date +%F+%H%M)/$deployment/$section/$package
 	dest_changes_file=$dest/$(basename $archive_file archive)changes
     mkdir -p $dest
     cp $archive_file $dest_changes_file
@@ -56,6 +56,7 @@ deploy_archive()
 	mv $dest_changes_file{.asc,}
 	zip -q $dest/$(basename $archive_file archive)zip $dest/*
   done
+  cd ${OLDPWD}
 }
 
 main_pwd=$(pwd)
